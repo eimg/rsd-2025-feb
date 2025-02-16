@@ -1,35 +1,69 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useContext, useEffect, useMemo } from "react";
+import { AppContext } from "./AppProvider";
 
-function App() {
-  const [count, setCount] = useState(0)
+import Item from "./Item";
+import Form from "./Form";
+import Header from "./Header";
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function big() {
+    console.log("call big function");
+    return "some value";
 }
 
-export default App
+export default function App() {
+    const { mode } = useContext(AppContext);
+
+    const value = useMemo(() => {
+        return big();
+    }, []);
+
+    console.log(value);
+
+    // useEffect(() => {
+    //     console.log("do something");
+    // }, [mode]);
+
+    // useState, useRef, useContext, useEffect, useMemo
+
+    const [data, setData] = useState([
+        { id: 3, content: "Apple", date: "1s" },
+        { id: 2, content: "Orange", date: "2s" },
+        { id: 1, content: "Milk", date: "3s" },
+    ]);
+
+    const del = id => {
+        setData(data.filter(item => item.id !== id));
+    }
+
+    const add = content => {
+        const id = data[0].id + 1;
+        setData([ 
+            { id, content, date: '1s' },
+            ...data 
+        ]);
+    }
+
+	return (
+		<div
+			style={{
+				background: mode == "dark" ? "#222" : "#efefef",
+                color: mode == "dark" ? "white" : "black",
+				minHeight: 2000,
+			}}>
+			<div style={{ maxWidth: 600, margin: "auto" }}>
+				<Header />
+
+				<Form add={add} />
+				<br />
+
+				{data.map(item => (
+					<Item
+						key={item.id}
+						item={item}
+						del={del}
+					/>
+				))}
+			</div>
+		</div>
+	);
+}
