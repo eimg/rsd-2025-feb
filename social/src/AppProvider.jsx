@@ -1,4 +1,4 @@
-import App from "./App";
+import AppRouter from "./AppRouter";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
@@ -26,7 +26,7 @@ export default function AppProvider() {
 		<ThemeProvider theme={theme}>
 			<AppContext.Provider value={{ mode, setMode, openDrawer, setOpenDrawer }}>
 				<CssBaseline />
-				<App />
+				<AppRouter />
 			</AppContext.Provider>
 		</ThemeProvider>
 	);
