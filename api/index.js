@@ -14,19 +14,31 @@ app.get("/posts", async (req, res) => {
         take: 5,
     });
 
-    setTimeout(() => {
-        res.json(data);
-    }, 2000);
+    res.json(data);
 });
 
 app.get("/posts/:id", async (req, res) => {
     const id = req.params.id;
     const post = await prisma.post.findUnique({
         where: { id: parseInt(id) },
-        include: { user: true, comments: true },
+        include: { 
+            user: true, 
+            comments: {
+                include: { user: true },
+            } 
+        },
     });
 
     res.json(post);
+});
+
+app.delete('/comments/:id', async (req, res) => {
+    const id = req.params.id;
+    const comment = await prisma.comment.delete({
+        where: { id: parseInt(id) },
+    });
+
+    res.json(comment);
 });
 
 app.listen(8080, () => {

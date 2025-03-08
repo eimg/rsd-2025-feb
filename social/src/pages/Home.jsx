@@ -1,52 +1,32 @@
 import { Avatar, Box, Card, CardContent, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import Post from "../components/Post";
 
 async function fetchPosts() {
     const api = "http://localhost:8080/posts";
     const res = await fetch(api);
 
-    return await res.json();
+    return res.json();
 }
 
 export default function Home() {
-    const [posts, setPosts] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { data: posts, error, isLoading } = useQuery({
+        queryKey: ["posts"],
+        queryFn: fetchPosts,
+    });
 
-    useEffect(() => {
-        fetchPosts().then((data) => {
-            setPosts(data);
-            setIsLoading(false);
-        }).catch((err) => {
-            setError(err);
-            setIsLoading(false);
-        });
-    }, []);
+    if (error) {
+		return <Typography>Error: {error.message}</Typography>;
+	}
+
+    if(isLoading) {
+        return <Typography>Loading...</Typography>
+    }
 
 	return (
 		<Box>
-			<Typography variant="h1">Home</Typography>
-
-            {isLoading && <Typography>Loading...</Typography>}
-
-            {error && <Typography>Error: {error.message}</Typography>}
-
 			{posts.map(post => (
-				<Card key={post.id} sx={{ mb: 2 }}>
-					<CardContent>
-						<Box
-							sx={{
-								display: "flex",
-								alignItems: "center",
-								gap: 1,
-                                mb: 1
-							}}>
-							<Avatar />
-							<Typography>{post.user.name}</Typography>
-						</Box>
-						<Typography>{post.content}</Typography>
-					</CardContent>
-				</Card>
+				<Post key={post.id} post={post} />
 			))}
 		</Box>
 	);

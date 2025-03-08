@@ -9,7 +9,7 @@ export default function Layout() {
     return <>
         <Header />
         <AppDrawer />
-        <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Container maxWidth="sm" sx={{ mt: 4 }}>
             <Outlet />
         </Container>
     </>
