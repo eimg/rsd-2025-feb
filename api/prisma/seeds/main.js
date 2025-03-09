@@ -33,7 +33,7 @@ async function main() {
     for (let i = 0; i < 10; i++) {
         await prisma.post.create({
             data: {
-                content: faker.lorem.paragraphs(),
+                content: faker.lorem.paragraph(),
                 userId: faker.number.int({min: 1, max: 5}),
             },
         });

@@ -4,28 +4,42 @@ import {
 	Menu as MenuIcon,
 	LightMode as LightModeIcon,
 	DarkMode as DarkModeIcon,
+	ArrowBack as BackIcon,
 } from "@mui/icons-material";
 
 import { useApp } from "../AppProvider";
 
+import { useLocation } from "react-router";
+
 export default function Header() {
-    const { mode, setMode, setOpenDrawer } = useApp();
+	const { mode, setMode, setOpenDrawer } = useApp();
+	const location = useLocation();
 
 	return (
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar position="static">
 				<Toolbar>
-					<IconButton
-						size="large"
-						edge="start"
-						color="inherit"
-						aria-label="menu"
-						sx={{ mr: 2 }}
-                        onClick={() => {
-                            setOpenDrawer(true);
-                        }}>
-						<MenuIcon />
-					</IconButton>
+					{location.pathname == "/" ? (
+						<IconButton
+							size="large"
+							edge="start"
+							color="inherit"
+							sx={{ mr: 2 }}
+							onClick={() => {
+								setOpenDrawer(true);
+							}}>
+							<MenuIcon />
+						</IconButton>
+					) : (
+						<IconButton
+							edge="start"
+							color="inherit"
+							sx={{ mr: 2 }}
+							onClick={() => window.history.back()}>
+							<BackIcon />
+						</IconButton>
+					)}
+
 					<Typography
 						variant="h6"
 						component="div"
