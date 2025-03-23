@@ -23,6 +23,6 @@ export const DarkTheme = {
 		background: "#121212",
 		text: "#ffffff",
 		card: "#1f1f1f",
-		border: "#272727",
+		border: "#555555",
 	},
 };
