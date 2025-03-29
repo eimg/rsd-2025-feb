@@ -11,7 +11,7 @@ export default function Layout() {
 				<Stack>
 					<Stack.Screen
 						name="(home)"
-						options={{ headerShown: false }}
+						options={{ headerShown: false, title: "Home", }}
 					/>
 					<Stack.Screen
 						name="about"
@@ -21,6 +21,10 @@ export default function Layout() {
 						name="contact"
 						options={{ title: "Contact", headerShown: true }}
 					/>
+                    <Stack.Screen
+                        name="add"
+                        options={{ title: "Add Post", presentation: "modal", }}
+                    />
 				</Stack>
 			</QueryClientProvider>
 		</ThemeProvider>

@@ -1,13 +1,28 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
+import { TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 
 export default function Layout() {
+    const { colors } = useTheme();
+
 	return (
 		<Tabs screenOptions={{ tabBarShowLabel: false }}>
 			<Tabs.Screen
 				name="index"
 				options={{
 					title: "Home",
+					headerRight: () => (
+						<TouchableOpacity onPress={() => router.push("/add")}>
+							<Ionicons
+								size={24}
+								name="add-outline"
+								color={colors.text}
+								style={{ marginRight: 10 }}
+							/>
+						</TouchableOpacity>
+					),
 					tabBarIcon: ({ color }) => (
 						<Ionicons
 							size={24}

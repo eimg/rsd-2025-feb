@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { ThemeProvider as NavigationThemeProvider } from "@react-navigation/native";
 import { LightTheme, DarkTheme } from "../constants/themes";
+import { StatusBar } from "expo-status-bar";
 
 type ThemeContextType = {
 	isDark: boolean;
@@ -20,6 +21,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 		<ThemeContext.Provider value={{ isDark, toggleTheme }}>
 			<NavigationThemeProvider value={isDark ? DarkTheme : LightTheme}>
 				{children}
+                <StatusBar style={isDark ? "light" : "dark"} />
 			</NavigationThemeProvider>
 		</ThemeContext.Provider>
 	);

@@ -1,22 +1,22 @@
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import Text from "@/components/text";
 import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
 type PostType = {
-    id: number;
-    content: string;
-    created: string;
-    user: {
-        name: string;
-        username: string;
-        bio: string;
-    }
-}
+	id: number;
+	content: string;
+	created: string;
+	user: {
+		name: string;
+		username: string;
+		bio: string;
+	};
+};
 
 async function fetchPosts(): Promise<PostType[]> {
-	const res = await fetch("http://localhost:8080/posts");
+	const res = await fetch("http://192.168.100.169:8080/posts");
 	return res.json();
 }
 
@@ -30,7 +30,7 @@ export default function Home() {
 		queryFn: fetchPosts,
 	});
 
-    const { colors } = useTheme();
+	const { colors } = useTheme();
 
 	if (isLoading) {
 		return (
@@ -48,7 +48,7 @@ export default function Home() {
 		);
 	}
 
-    if (!posts) {
+	if (!posts) {
 		return (
 			<View style={{ alignItems: "center" }}>
 				<Text>No posts vailable</Text>
@@ -60,18 +60,66 @@ export default function Home() {
 		<ScrollView>
 			{posts.map(post => {
 				return (
-					<View style={[styles.card, { borderColor: colors.border }]}>
+					<View
+						key={post.id}
+						style={[styles.card, { borderColor: colors.border }]}>
 						<View style={styles.cardBody}>
 							<Ionicons
 								name="person-circle"
 								size={48}
 								color={colors.text + "80"}
 							/>
-							<View style={{ gap: 6 }}>
-                                <Text style={styles.time}>{post.created}</Text>
+							<View style={styles.cardContent}>
+								<Text style={styles.time}>{post.created}</Text>
 								<Text style={styles.content}>
 									{post.content}
 								</Text>
+								<View
+									style={{
+										flexDirection: "row",
+										justifyContent: "space-between",
+										marginTop: 10,
+									}}>
+									<View
+										style={{
+											flexDirection: "row",
+											gap: 10,
+											alignItems: "center",
+										}}>
+										<TouchableOpacity>
+											<Ionicons
+												name="heart-outline"
+												size={24}
+												color="red"
+											/>
+										</TouchableOpacity>
+										<Text>5</Text>
+									</View>
+									<View
+										style={{
+											flexDirection: "row",
+											gap: 10,
+											alignItems: "center",
+										}}>
+										<TouchableOpacity>
+											<Ionicons
+												name="chatbubble-outline"
+												size={24}
+												color="green"
+											/>
+										</TouchableOpacity>
+										<Text>10</Text>
+									</View>
+									<View>
+										<TouchableOpacity>
+											<Ionicons
+												name="share-outline"
+												size={24}
+												color={colors.text + "80"}
+											/>
+										</TouchableOpacity>
+									</View>
+								</View>
 							</View>
 						</View>
 					</View>
@@ -82,19 +130,23 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-    card: {
-        paddingHorizontal: 16,
-        paddingVertical: 20,
-        borderBottomWidth: 1,
-    },
-    cardBody: {
-        flexDirection: "row",
-        gap: 14,
-    },
-    content: {
-        fontSize: 18,
-    },
-    time: {
-        color: "green"
-    }
+	card: {
+		paddingHorizontal: 16,
+		paddingVertical: 20,
+		borderBottomWidth: 1,
+	},
+	cardBody: {
+		flexDirection: "row",
+		gap: 14,
+	},
+	cardContent: {
+		gap: 6,
+		flex: 1,
+	},
+	content: {
+		fontSize: 18,
+	},
+	time: {
+		color: "green",
+	},
 });
