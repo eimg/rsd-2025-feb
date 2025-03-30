@@ -3,9 +3,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
 import { router } from "expo-router";
+import { useAuth } from "@/components/auth-provider";
 
 export default function Layout() {
     const { colors } = useTheme();
+
+    const { token, user } = useAuth();
 
 	return (
 		<Tabs screenOptions={{ tabBarShowLabel: false }}>
@@ -13,16 +16,22 @@ export default function Layout() {
 				name="index"
 				options={{
 					title: "Home",
-					headerRight: () => (
-						<TouchableOpacity onPress={() => router.push("/add")}>
-							<Ionicons
-								size={24}
-								name="add-outline"
-								color={colors.text}
-								style={{ marginRight: 10 }}
-							/>
-						</TouchableOpacity>
-					),
+					headerRight: () => {
+                        return (
+							user &&
+							token && (
+								<TouchableOpacity
+									onPress={() => router.push("/add")}>
+									<Ionicons
+										size={24}
+										name="add-outline"
+										color={colors.text}
+										style={{ marginRight: 10 }}
+									/>
+								</TouchableOpacity>
+							)
+						);
+                    },
 					tabBarIcon: ({ color }) => (
 						<Ionicons
 							size={24}

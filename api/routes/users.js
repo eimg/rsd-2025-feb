@@ -20,19 +20,42 @@ router.get("/verify", auth, async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-    const { name, username, bio, password } = req.body;
+    try {
+        const { name, username, bio, password } = req.body;
 
-    if(!name || !username || !password) {
-        return res.status(400).json({ message: "Missing required fields" });
+        if (!name || !username || !password) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        // Check if username already exists
+        const existingUser = await prisma.user.findUnique({
+            where: { username },
+        });
+
+        if (existingUser) {
+            return res.status(409).json({ message: "Username already taken" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await prisma.user.create({
+            data: { name, username, bio, password: hashedPassword },
+        });
+
+        // Remove password from response
+        const { password: _, ...userWithoutPassword } = user;
+        
+        res.status(201).json(userWithoutPassword);
+    } catch (error) {
+        console.error("Registration error:", error);
+        
+        // Handle Prisma unique constraint error
+        if (error.code === 'P2002' && error.meta?.target?.includes('username')) {
+            return res.status(409).json({ message: "Username already taken" });
+        }
+        
+        res.status(500).json({ message: "Failed to register user" });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-        data: { name, username, bio, password: hashedPassword },
-    });
-
-    res.json(user);
 });
 
 router.post("/login", async (req, res) => {
@@ -58,7 +81,10 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
 
-    res.json({ token, user });
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user;
+    
+    res.json({ token, user: userWithoutPassword });
 });
 
 module.exports = { usersRouter: router };
