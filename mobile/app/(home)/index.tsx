@@ -3,20 +3,14 @@ import Text from "@/components/text";
 import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { config } from "@/libs/config";
+import { formatDistanceToNow } from "date-fns";
 
-type PostType = {
-	id: number;
-	content: string;
-	created: string;
-	user: {
-		name: string;
-		username: string;
-		bio: string;
-	};
-};
+import type { PostType } from "@/types/PostType";
 
 async function fetchPosts(): Promise<PostType[]> {
-	const res = await fetch("http://192.168.100.169:8080/posts");
+	const res = await fetch(`${config.apiUrl}/posts`);
 	return res.json();
 }
 
@@ -70,10 +64,16 @@ export default function Home() {
 								color={colors.text + "80"}
 							/>
 							<View style={styles.cardContent}>
-								<Text style={styles.time}>{post.created}</Text>
-								<Text style={styles.content}>
-									{post.content}
-								</Text>
+								<TouchableOpacity onPress={() => {
+									router.push(`/post/${post.id}`);
+								}}>
+									<Text style={styles.time}>
+										{formatDistanceToNow(new Date(post.created), { addSuffix: true })}
+									</Text>
+									<Text style={styles.content}>
+										{post.content}
+									</Text>
+								</TouchableOpacity>
 								<View
 									style={{
 										flexDirection: "row",
@@ -108,7 +108,7 @@ export default function Home() {
 												color="green"
 											/>
 										</TouchableOpacity>
-										<Text>10</Text>
+										<Text>{post.comments.length}</Text>
 									</View>
 									<View>
 										<TouchableOpacity>

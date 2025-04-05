@@ -15,16 +15,20 @@ function auth(req, res, next) {
 
 	const token = authorization.split(" ")[1];
 
-    if (!token) {
+	if (!token) {
 		return res.status(401).json({ message: "Unauthorized" });
 	}
 
-    if(jwt.verify(token, process.env.JWT_SECRET)) {
-        req.userId = jwt.decode(token, process.env.JWT_SECRET).id;
-        return next();
-    }
+	try {
+		if (jwt.verify(token, process.env.JWT_SECRET)) {
+			req.userId = jwt.decode(token, process.env.JWT_SECRET).id;
+			return next();
+		}
+	} catch (e) {
+		return res.status(401).json({ message: "Invalid token" });
+	}
 
-    return res.status(401).json({ message: "Unauthorized" });
+	return res.status(401).json({ message: "Unauthorized" });
 }
 
 module.exports = { auth };
