@@ -19,4 +19,15 @@ export type PostType = {
 		username: string;
 		bio: string;
 	};
+	postLikes: PostLikeType[];
+};
+
+export type PostLikeType = {
+	id: number;
+	postId: number;
+	userId: number;
+	user: {
+		name: string;
+		username: string;
+	};
 };

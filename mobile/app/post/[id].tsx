@@ -43,6 +43,28 @@ async function deleteComment(commentId: string, token: string) {
 	return res.json();
 }
 
+async function likePost(postId: string, token: string): Promise<void> {
+	const res = await fetch(`${config.apiUrl}/posts/${postId}/like`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	return res.json();
+}
+
+async function unlikePost(postId: string, token: string): Promise<void> {
+	const res = await fetch(`${config.apiUrl}/posts/${postId}/unlike`, {
+		method: "DELETE",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	return res.json();
+}
+
 export default function Post() {
 	const { id } = useLocalSearchParams();
 	const { colors } = useTheme();
@@ -74,6 +96,27 @@ export default function Post() {
 			queryClient.invalidateQueries({ queryKey: ["post", id] });
 		},
 	});
+
+	const likeMutation = useMutation({
+		mutationFn: () => likePost(id as string, token!),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
+			queryClient.invalidateQueries({ queryKey: ["post", id] });
+		},
+	});
+
+	const unlikeMutation = useMutation({
+		mutationFn: () => unlikePost(id as string, token!),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
+			queryClient.invalidateQueries({ queryKey: ["post", id] });
+		},
+	});
+
+	function isLiked(post: PostType) {
+		if (!user) return false;
+		return post.postLikes.some(like => like.userId === user?.id);
+	}
 
 	if (isLoading) {
 		return <Text>Loading...</Text>;
@@ -111,14 +154,26 @@ export default function Post() {
 						<Text style={styles.content}>{post.content}</Text>
 						<View style={styles.actions}>
 							<View style={styles.actionGroup}>
-								<TouchableOpacity>
-									<Ionicons
-										name="heart-outline"
-										size={24}
-										color="red"
-									/>
-								</TouchableOpacity>
-								<Text>5</Text>
+								{isLiked(post) ? (
+									<TouchableOpacity
+										onPress={() => unlikeMutation.mutate()}>
+										<Ionicons
+											name="heart"
+											size={24}
+											color="red"
+										/>
+									</TouchableOpacity>
+								) : (
+									<TouchableOpacity
+										onPress={() => likeMutation.mutate()}>
+										<Ionicons
+											name="heart-outline"
+											size={24}
+											color="red"
+										/>
+									</TouchableOpacity>
+								)}
+								<Text>{post.postLikes.length}</Text>
 							</View>
 							<View style={styles.actionGroup}>
 								<TouchableOpacity>
@@ -200,7 +255,7 @@ export default function Post() {
 											{ addSuffix: true }
 										)}
 									</Text>
-									{user && (
+									{user && comment.user.id === user.id && (
 										<TouchableOpacity
 											onPress={() =>
 												deleteCommentMutation.mutate(
@@ -221,27 +276,6 @@ export default function Post() {
 								<Text style={styles.commentContent}>
 									{comment.content}
 								</Text>
-								<View style={styles.actions}>
-									<View style={styles.actionGroup}>
-										<TouchableOpacity>
-											<Ionicons
-												name="heart-outline"
-												size={20}
-												color="red"
-											/>
-										</TouchableOpacity>
-										<Text>2</Text>
-									</View>
-									<View>
-										<TouchableOpacity>
-											<Ionicons
-												name="share-outline"
-												size={20}
-												color={colors.text + "80"}
-											/>
-										</TouchableOpacity>
-									</View>
-								</View>
 							</View>
 						</View>
 					</View>

@@ -11,15 +11,9 @@ import Text from "@/components/text";
 import { useTheme } from "@react-navigation/native";
 import { useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { router } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/components/auth-provider";
-
-// api = http://192.168.100.169:8080/
-// login route -> /users/login
-// register route -> /users/register
-
-const API_URL = "http://192.168.100.169:8080";
+import { config } from "@/libs/config";
 
 type LoginFormData = {
 	username: string;
@@ -36,7 +30,7 @@ type RegisterFormData = {
 type LoginResponse = {
 	token: string;
 	user: {
-		id: string;
+		id: number;
 		name: string;
 		username: string;
 		bio: string;
@@ -78,7 +72,7 @@ export default function Profile() {
 	// Login mutation
 	const loginMutation = useMutation({
 		mutationFn: async (data: LoginFormData) => {
-			const response = await fetch(`${API_URL}/users/login`, {
+			const response = await fetch(`${config.apiUrl}/users/login`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -108,7 +102,7 @@ export default function Profile() {
 	// Register mutation
 	const registerMutation = useMutation({
 		mutationFn: async (data: RegisterFormData) => {
-			const response = await fetch(`${API_URL}/users/register`, {
+			const response = await fetch(`${config.apiUrl}/users/register`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

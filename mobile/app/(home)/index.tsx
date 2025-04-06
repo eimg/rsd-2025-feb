@@ -1,16 +1,38 @@
 import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import Text from "@/components/text";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { config } from "@/libs/config";
 import { formatDistanceToNow } from "date-fns";
-
+import { useAuth } from "@/components/auth-provider";
 import type { PostType } from "@/types/PostType";
 
 async function fetchPosts(): Promise<PostType[]> {
 	const res = await fetch(`${config.apiUrl}/posts`);
+	return res.json();
+}
+
+async function likePost(postId: number, token: string): Promise<void> {
+	const res = await fetch(`${config.apiUrl}/posts/${postId}/like`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	return res.json();
+}
+
+async function unlikePost(postId: number, token: string): Promise<void> {
+	const res = await fetch(`${config.apiUrl}/posts/${postId}/unlike`, {
+		method: "DELETE",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
 	return res.json();
 }
 
@@ -24,9 +46,31 @@ export default function Home() {
 		queryFn: fetchPosts,
 	});
 
+	const { user, token } = useAuth();
+    const queryClient = useQueryClient();
+
 	const { colors } = useTheme();
 
-	if (isLoading) {
+    const likeMutation = useMutation({
+        mutationFn: (postId: number) => likePost(postId, token!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["posts"] });
+        },
+    });
+
+    const unlikeMutation = useMutation({
+        mutationFn: (postId: number) => unlikePost(postId, token!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["posts"] });
+        },
+    });
+
+	function isLiked(post: PostType) {
+		if (!user) return false;
+		return post.postLikes.some(like => like.userId === user?.id);
+	}
+
+    if (isLoading) {
 		return (
 			<View style={{ alignItems: "center" }}>
 				<Text>Loading...</Text>
@@ -64,11 +108,15 @@ export default function Home() {
 								color={colors.text + "80"}
 							/>
 							<View style={styles.cardContent}>
-								<TouchableOpacity onPress={() => {
-									router.push(`/post/${post.id}`);
-								}}>
+								<TouchableOpacity
+									onPress={() => {
+										router.push(`/post/${post.id}`);
+									}}>
 									<Text style={styles.time}>
-										{formatDistanceToNow(new Date(post.created), { addSuffix: true })}
+										{formatDistanceToNow(
+											new Date(post.created),
+											{ addSuffix: true }
+										)}
 									</Text>
 									<Text style={styles.content}>
 										{post.content}
@@ -86,14 +134,24 @@ export default function Home() {
 											gap: 10,
 											alignItems: "center",
 										}}>
-										<TouchableOpacity>
-											<Ionicons
-												name="heart-outline"
-												size={24}
-												color="red"
-											/>
-										</TouchableOpacity>
-										<Text>5</Text>
+										{isLiked(post) ? (
+											<TouchableOpacity onPress={() => unlikeMutation.mutate(post.id)}>
+												<Ionicons
+													name="heart"
+													size={24}
+													color="red"
+												/>
+											</TouchableOpacity>
+										) : (
+											<TouchableOpacity onPress={() => likeMutation.mutate(post.id)}>
+												<Ionicons
+													name="heart-outline"
+													size={24}
+													color="red"
+												/>
+											</TouchableOpacity>
+										)}
+										<Text>{post.postLikes.length}</Text>
 									</View>
 									<View
 										style={{

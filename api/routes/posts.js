@@ -8,7 +8,7 @@ const { auth } = require("../middlewares/auth");
 
 router.get("/", async (req, res) => {
 	const data = await prisma.post.findMany({
-		include: { user: true, comments: true },
+		include: { user: true, comments: true, postLikes: true },
 		orderBy: { id: "desc" },
 		take: 5,
 	});
@@ -25,6 +25,9 @@ router.get("/:id", async (req, res) => {
 			comments: {
 				include: { user: true },
 			},
+			postLikes: {
+				include: { user: true },
+            },
 		},
 	});
 
@@ -54,6 +57,30 @@ router.post("/", auth, async (req, res) => {
 		console.error("Error creating post:", error);
 		res.status(500).json({ message: "Failed to create post" });
 	}
+});
+
+router.post("/:id/like", auth, async (req, res) => {
+	const { id } = req.params;
+	const { userId } = req;
+
+	const like = await prisma.postLike.create({
+		data: { postId: parseInt(id), userId }
+	});
+
+	res.json(like);
+});
+
+router.delete("/:id/unlike", auth, async (req, res) => {
+	const { id } = req.params;
+	const { userId } = req;
+
+	const result = await prisma.postLike.deleteMany({
+		where: {
+			AND: { postId: parseInt(id), userId }
+		},
+	});
+
+	res.json(result);
 });
 
 module.exports = { postsRouter: router };

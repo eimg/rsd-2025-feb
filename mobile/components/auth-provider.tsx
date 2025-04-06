@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
-
-const API_URL = "http://192.168.100.169:8080";
+import { config } from '@/libs/config';
 
 // Types for our auth context
 type User = {
-  id: string;
+  id: number;
   name: string;
   username: string;
   bio: string;
@@ -62,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Verify token validity with the API
   const verifyToken = async (tokenToVerify: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_URL}/users/verify`, {
+      const response = await fetch(`${config.apiUrl}/users/verify`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${tokenToVerify}`,

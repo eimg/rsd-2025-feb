@@ -11,27 +11,38 @@ datasource db {
 }
 
 model User {
-    id       Int       @id @default(autoincrement())
-    username String    @unique
-    password String
-    name     String
-    bio      String?
-    posts    Post[]
-    comments Comment[]
+    id        Int        @id @default(autoincrement())
+    username  String     @unique
+    password  String
+    name      String
+    bio       String?
+    posts     Post[]
+    comments  Comment[]
+    postLikes PostLike[]
 }
 
 model Post {
-    id       Int       @id @default(autoincrement())
-    content  String
-    user     User      @relation(fields: [userId], references: [id])
-    userId   Int
-    comments Comment[]
-    created  DateTime  @default(now())
+    id        Int        @id @default(autoincrement())
+    content   String
+    user      User       @relation(fields: [userId], references: [id])
+    userId    Int
+    comments  Comment[]
+    postLikes PostLike[]
+    created   DateTime   @default(now())
 }
 
 model Comment {
     id      Int      @id @default(autoincrement())
     content String
+    user    User     @relation(fields: [userId], references: [id])
+    userId  Int
+    post    Post     @relation(fields: [postId], references: [id])
+    postId  Int
+    created DateTime @default(now())
+}
+
+model PostLike {
+    id      Int      @id @default(autoincrement())
     user    User     @relation(fields: [userId], references: [id])
     userId  Int
     post    Post     @relation(fields: [postId], references: [id])
