@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -43,12 +45,22 @@ export default async function RootLayout({
 }>) {
 	const genres = await getGenres();
 
+    async function search(data: FormData) {
+        "use server";
+        const q = data.get("q");
+        redirect(`/search?q=${q}`);
+    }
+
 	return (
 		<html lang="en">
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<div className="p-4 border-b">
+				<div className="p-4 border-b flex items-center justify-between">
 					<h1 className="text-2xl font-bold">Next Movie</h1>
+					<form className="flex items-center gap-2" action={search}>
+						<Input placeholder="Search Movies..." name="q" />
+						<Button type="submit">Search</Button>
+					</form>
 				</div>
 				<div className="flex">
 					<div className="w-[250px] flex flex-col gap-1 p-4 border-r">
@@ -56,7 +68,9 @@ export default async function RootLayout({
 							variant="outline"
 							className="justify-start"
 							asChild>
-							<Link href="/" className="flex items-center gap-2">
+							<Link
+								href="/"
+								className="flex items-center gap-2">
 								<svg
 									width="15"
 									height="15"
