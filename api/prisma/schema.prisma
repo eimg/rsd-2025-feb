@@ -11,24 +11,26 @@ datasource db {
 }
 
 model User {
-    id        Int        @id @default(autoincrement())
-    username  String     @unique
-    password  String
-    name      String
-    bio       String?
-    posts     Post[]
-    comments  Comment[]
-    postLikes PostLike[]
+    id            Int            @id @default(autoincrement())
+    username      String         @unique
+    password      String
+    name          String
+    bio           String?
+    posts         Post[]
+    comments      Comment[]
+    postLikes     PostLike[]
+    notifications Notification[]
 }
 
 model Post {
-    id        Int        @id @default(autoincrement())
-    content   String
-    user      User       @relation(fields: [userId], references: [id])
-    userId    Int
-    comments  Comment[]
-    postLikes PostLike[]
-    created   DateTime   @default(now())
+    id            Int            @id @default(autoincrement())
+    content       String
+    user          User           @relation(fields: [userId], references: [id])
+    userId        Int
+    comments      Comment[]
+    postLikes     PostLike[]
+    notifications Notification[]
+    created       DateTime       @default(now())
 }
 
 model Comment {
@@ -47,5 +49,16 @@ model PostLike {
     userId  Int
     post    Post     @relation(fields: [postId], references: [id])
     postId  Int
+    created DateTime @default(now())
+}
+
+model Notification {
+    id      Int      @id @default(autoincrement())
+    type    String
+    user    User     @relation(fields: [userId], references: [id])
+    userId  Int
+    post    Post     @relation(fields: [postId], references: [id])
+    postId  Int
+    read    Boolean  @default(false)
     created DateTime @default(now())
 }

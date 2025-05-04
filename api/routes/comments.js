@@ -33,6 +33,14 @@ router.post("/", auth, async (req, res) => {
 		},
 	});
 
+	const noti = await prisma.notification.create({
+		data: {
+			userId: req.userId,
+			postId: parseInt(postId),
+			type: "post_comment",
+		},
+	});
+
 	res.json(comment);
 });
 

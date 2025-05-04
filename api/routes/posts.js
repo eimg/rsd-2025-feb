@@ -97,6 +97,14 @@ router.post("/:id/like", auth, async (req, res) => {
 		data: { postId: parseInt(id), userId }
 	});
 
+	const noti = await prisma.notification.create({
+		data: {
+			userId: req.userId,
+			postId: parseInt(id),
+			type: "post_like",
+		},
+	});
+
 	res.json(like);
 });
 

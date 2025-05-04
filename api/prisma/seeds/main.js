@@ -48,6 +48,16 @@ async function main() {
 			},
 		});
     }
+
+    // npx prisma migrate dev --name notis
+    // npx prisma migrate reset
+    await prisma.notification.createMany({
+        data: [
+            { type: "post_like", userId: 1, postId: 10, },
+            { type: "post_like", userId: 1, postId: 9, },
+            { type: "post_comment", userId: 1, postId: 8, },
+        ],
+    });
 }
 
 main()
