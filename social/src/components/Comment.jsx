@@ -9,25 +9,40 @@ import {
 import { grey } from "@mui/material/colors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-
+import { useApp } from "../AppProvider";
 import { formatRelative } from "date-fns";
 
-async function deleteComment(id) {
-	const api = `http://localhost:8080/comments/${id}`;
-	const res = await fetch(api, { method: "DELETE" });
-
-	return res.json();
-}
-
-export default function Post({ comment }) {
+export default function Comment({ comment }) {
+	const { user } = useApp();
 	const queryClient = useQueryClient();
 
-	const mutation = useMutation({
-		mutationFn: deleteComment,
+	const deleteMutation = useMutation({
+		mutationFn: async (id) => {
+			const token = localStorage.getItem("token");
+			const response = await fetch(`http://localhost:8080/comments/${id}`, {
+				method: "DELETE",
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			if (!response.ok) {
+				throw new Error("Failed to delete comment");
+			}
+		},
 		onSuccess: () => {
-			queryClient.invalidateQueries("post");
+			queryClient.invalidateQueries({ queryKey: ["post"] });
 		},
 	});
+
+	const handleDelete = async () => {
+		if (window.confirm("Are you sure you want to delete this comment?")) {
+			try {
+				await deleteMutation.mutateAsync(comment.id);
+			} catch (error) {
+				console.error("Error deleting comment:", error);
+			}
+		}
+	};
 
 	return (
 		<Card
@@ -41,7 +56,7 @@ export default function Post({ comment }) {
 					sx={{
 						display: "flex",
 						justifyContent: "space-between",
-                        alignItems: "flex-start",
+						alignItems: "flex-start",
 						gap: 1,
 						mb: 1,
 					}}>
@@ -57,12 +72,15 @@ export default function Post({ comment }) {
 							</Typography>
 						</Box>
 					</Box>
-					<IconButton
-                        size="small"
-						color="error"
-						onClick={() => mutation.mutate(comment.id)}>
-						<DeleteIcon fontSize="inherit" />
-					</IconButton>
+					{user && user.id === comment.user.id && (
+						<IconButton
+							size="small"
+							color="error"
+							onClick={handleDelete}
+							disabled={deleteMutation.isPending}>
+							<DeleteIcon fontSize="inherit" />
+						</IconButton>
+					)}
 				</Box>
 				<Typography>{comment.content}</Typography>
 			</CardContent>

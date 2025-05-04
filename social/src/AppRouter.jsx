@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Show from "./pages/Show";
+import AddPost from "./pages/AddPost";
 
 export default function() {
     return <BrowserRouter>
@@ -16,6 +17,7 @@ export default function() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/add" element={<AddPost />} />
             </Route>
         </Routes>
     </BrowserRouter>
