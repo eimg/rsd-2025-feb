@@ -31,11 +31,20 @@ app.post("/tasks", async (req, res) => {
 
 app.put("/tasks/:id/toggle", async (req, res) => {
 	const { id } = req.params;
-	const task = await prisma.todo.update({
+
+	const task = await prisma.todo.findUnique({
 		where: { id: parseInt(id) },
-		data: { done: true },
 	});
-	res.json(task);
+
+	if (!task) {
+		return res.status(404).json({ error: "Task not found" });
+	}
+
+	const updatedTask = await prisma.todo.update({
+		where: { id: parseInt(id) },
+		data: { done: !task.done },
+	});
+	res.json(updatedTask);
 });
 
 app.delete("/tasks/:id", async (req, res) => {

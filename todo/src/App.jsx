@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { add, del, toggle } from "./todoSlice";
+import { addTask, toggleTask, deleteTask } from "./todoSlice";
 
 export default function App() {
     const nameRef = useRef();
@@ -20,7 +20,7 @@ export default function App() {
 					const name = nameRef.current.value;
 					if (name == "") return false;
 
-					dispatch(add(name));
+					dispatch(addTask(name));
 
 					e.currentTarget.reset();
 				}}>
@@ -36,7 +36,7 @@ export default function App() {
 					return (
 						<li key={task.id}>
 							<a
-								onClick={() => dispatch(del(task.id))}
+								onClick={() => dispatch(deleteTask(task.id))}
 								href="#"
 								style={{
 									marginRight: 10,
@@ -45,7 +45,7 @@ export default function App() {
 								&times;
 							</a>
 							<a
-								onClick={() => dispatch(toggle(task.id))}
+								onClick={() => dispatch(toggleTask(task.id))}
 								href="#"
 								style={{
 									marginRight: 20,
@@ -64,7 +64,7 @@ export default function App() {
 					return (
 						<li key={task.id}>
 							<a
-								onClick={() => dispatch(del(task.id))}
+								onClick={() => dispatch(deleteTask(task.id))}
 								href="#"
 								style={{
 									marginRight: 10,
@@ -73,7 +73,7 @@ export default function App() {
 								&times;
 							</a>
 							<a
-								onClick={() => dispatch(toggle(task.id))}
+								onClick={() => dispatch(toggleTask(task.id))}
 								href="#"
 								style={{
 									marginRight: 20,

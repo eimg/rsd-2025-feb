@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+
+<body>
+    <h1>Chat Room</h1>
+    <form>
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="message" placeholder="Message">
+        <button id="send">Send</button>
+    </form>
+
+    <div id="messages"></div>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:8080/chat");
+        ws.addEventListener("message", function (event) {
+            displayMessage(event.data);
+        });
+
+        document.querySelector("form").onsubmit = e => {
+            e.preventDefault();
+            sendMessage();
+        };
+
+        function sendMessage() {
+            const message = document.getElementById("message").value;
+            const name = document.getElementById("name").value;
+            ws.send(JSON.stringify({ message, name }));
+        }
+
+        function displayMessage(message) {
+            const messages = document.getElementById("messages");
+            const data = JSON.parse(message);
+
+            const messageElement = document.createElement("div");
+            messageElement.innerHTML = `<b>${data.name}</b>: ${data.message}`;
+
+            messages.appendChild(messageElement);
+        }
+    </script>
+</body>
+
+</html>
